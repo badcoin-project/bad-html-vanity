@@ -104,7 +104,12 @@ If any of those fail, the tool is broken — do not use it for real funds. Open 
 
 ## License
 
-MIT. The bundled libraries retain their original licenses (also MIT or BSD compatible).
+[MIT](LICENSE). The bundled third-party libraries retain their original licenses, all MIT-compatible:
+
+- [elliptic.js](https://github.com/indutny/elliptic) — MIT
+- [js-sha256](https://github.com/emn178/js-sha256) — MIT
+- [jsPDF](https://github.com/parallax/jsPDF) — MIT
+- [qrcode-generator](https://github.com/kazuhikoarase/qrcode-generator) — MIT
 
 ## Provenance
 

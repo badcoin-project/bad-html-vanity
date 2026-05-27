@@ -19,15 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-The following third-party libraries are bundled into the built HTML file and
-retain their original licenses:
-
-- elliptic.js (https://github.com/indutny/elliptic) - MIT
-- js-sha256 (https://github.com/emn178/js-sha256) - MIT
-- jsPDF (https://github.com/parallax/jsPDF) - MIT
-- qrcode-generator (https://github.com/kazuhikoarase/qrcode-generator) - MIT
-
-Each of these is MIT-licensed and compatible with this project's license.
