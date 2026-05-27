@@ -1,0 +1,28 @@
+# macOS metadata
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Python (build script)
+__pycache__/
+*.pyc
+*.pyo
+.python-version
+
+# Local test outputs / scratch
+*.tmp
+*.log
+*.bak
+
+# Never commit any actual wallet data, even from local tests
+*.wif
+wallet*.json
+private*.txt
+secret*.txt

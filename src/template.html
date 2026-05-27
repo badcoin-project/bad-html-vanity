@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' data: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:;">
+<title>BadCoin Vanity Address Generator</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --bg-soft: #f5f7fb;
+  --bg-card: #ffffff;
+  --ink: #0b0b0b;
+  --ink-soft: #475569;
+  --ink-mute: #64748b;
+  --rule: #d8dee9;
+  --navy: #1e3a5f;
+  --navy-soft: #e8eef5;
+  --accent: #b91c1c;
+  --warn-bg: #fef3c7;
+  --warn-border: #f59e0b;
+  --warn-ink: #78350f;
+  --ok: #047857;
+  --ok-soft: #e6f4ee;
+  --bad: #b91c1c;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: var(--bg-soft);
+  color: var(--ink);
+  line-height: 1.5;
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+.app { max-width: 1100px; margin: 0 auto; }
+
+/* Header */
+.header {
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: 12px;
+  padding: 1.5rem 2rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+.header img.coin { width: 64px; height: 64px; }
+.header img.wordmark { height: 32px; }
+.header-text { flex: 1; }
+.header h1 { font-size: 1.6rem; color: var(--navy); font-weight: 800; line-height: 1.15; }
+.header .sub { font-size: 0.9rem; color: var(--ink-soft); margin-top: 4px; }
+
+/* Warning banner */
+.warning {
+  background: var(--warn-bg);
+  border-left: 4px solid var(--warn-border);
+  color: var(--warn-ink);
+  padding: 0.85rem 1.25rem;
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+}
+.warning strong { display: block; margin-bottom: 4px; font-size: 0.95rem; }
+
+/* Panels */
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--rule);
+  border-radius: 10px;
+  padding: 1.25rem 1.5rem;
+  margin-bottom: 1rem;
+}
+.panel h2 {
+  font-size: 0.82rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-soft);
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Search form */
+.search-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.search-row label {
+  font-size: 0.85rem;
+  color: var(--ink-soft);
+  font-weight: 600;
+  margin-right: 0.25rem;
+}
+input[type="text"] {
+  flex: 1;
+  min-width: 200px;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--rule);
+  border-radius: 6px;
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 1.05rem;
+  text-transform: none;
+}
+input[type="text"]:focus {
+  outline: none;
+  border-color: var(--navy);
+  box-shadow: 0 0 0 3px rgba(30, 58, 95, 0.12);
+}
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+  color: var(--ink);
+  margin-top: 0.75rem;
+}
+.checkbox-row input { width: 1.05rem; height: 1.05rem; }
+.btn {
+  padding: 0.6rem 1.1rem;
+  border: 1px solid var(--rule);
+  background: var(--bg-card);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: var(--ink);
+  transition: all 0.15s;
+}
+.btn:hover:not(:disabled) { background: var(--navy-soft); border-color: var(--navy); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.btn-primary {
+  background: var(--navy);
+  color: white;
+  border-color: var(--navy);
+}
+.btn-primary:hover:not(:disabled) { background: #122947; color: white; }
+.btn-export { padding: 0.45rem 0.85rem; font-size: 0.85rem; }
+
+/* Reachability */
+.reachability { margin-top: 0.75rem; font-size: 0.88rem; font-weight: 500; min-height: 1.3em; }
+.reachability.good { color: var(--ok); }
+.reachability.bad { color: var(--bad); }
+
+/* Stats panel */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.85rem;
+}
+.stat {
+  background: var(--bg-soft);
+  border-radius: 8px;
+  padding: 0.8rem 1rem;
+}
+.stat-label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--ink-mute);
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-family: ui-monospace, monospace;
+  color: var(--ink);
+}
+
+/* Results */
+.empty {
+  color: var(--ink-mute);
+  font-style: italic;
+  font-size: 0.92rem;
+  text-align: center;
+  padding: 1.5rem 0;
+}
+.result-card {
+  background: var(--bg-soft);
+  border: 1px solid var(--rule);
+  border-left: 4px solid var(--ok);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 0.85rem;
+}
+.result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.75rem;
+}
+.result-header strong { color: var(--ok); font-size: 1.05rem; }
+.result-time { font-size: 0.8rem; color: var(--ink-mute); font-family: ui-monospace, monospace; }
+.result-field { margin-bottom: 0.6rem; }
+.result-field label {
+  display: block;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--ink-mute);
+  font-weight: 700;
+  margin-bottom: 3px;
+}
+.result-value {
+  font-family: ui-monospace, "SF Mono", Menlo, monospace;
+  font-size: 0.92rem;
+  color: var(--ink);
+  word-break: break-all;
+  user-select: all;
+  background: var(--bg-card);
+  padding: 0.5rem 0.7rem;
+  border-radius: 4px;
+  border: 1px solid var(--rule);
+}
+.result-value.secret { background: #fff8e6; border-color: #f59e0b; }
+.result-value.small { font-size: 0.78rem; }
+.result-actions { margin-top: 0.85rem; display: flex; gap: 0.5rem; }
+
+/* Footer */
+.footer {
+  text-align: center;
+  color: var(--ink-mute);
+  font-size: 0.82rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--rule);
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+  <header class="header">
+    <img class="coin" src="data:image/png;base64,{{COIN_B64}}" alt="BadCoin">
+    <div class="header-text">
+      <h1>BadCoin Vanity Address Generator</h1>
+      <div class="sub">Generate a custom BadCoin address that starts with letters you choose. 100% client-side. Your keys never leave this page.</div>
+    </div>
+  </header>
+
+  <div class="warning">
+    <strong>Security notice</strong>
+    Anyone with the private key can spend the coins. After you find an address, save the PDF or PNG, store it offline, and send a small test amount before you use it for real funds. For maximum safety, save this HTML file to disk and open it without an internet connection.
+  </div>
+
+  <section class="panel">
+    <h2>Search</h2>
+    <div class="search-row">
+      <label for="prefix">Prefix:</label>
+      <input id="prefix" type="text" placeholder="e.g. BANK, BAD, BERN" maxlength="8" autocomplete="off" spellcheck="false">
+      <button id="start" class="btn btn-primary" disabled>▶ Start search</button>
+      <button id="stop" class="btn" disabled>■ Stop</button>
+    </div>
+    <div class="checkbox-row">
+      <input id="caseInsensitive" type="checkbox">
+      <label for="caseInsensitive">Match case-insensitively (faster; "Bank", "bank", "BANK" all count)</label>
+    </div>
+    <div id="reachability" class="reachability"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Search status</h2>
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-label">Attempts</div>
+        <div class="stat-value" id="tries">0</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Rate</div>
+        <div class="stat-value" id="rate">0 /sec</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">Elapsed</div>
+        <div class="stat-value" id="elapsed">—</div>
+      </div>
+      <div class="stat">
+        <div class="stat-label">ETA</div>
+        <div class="stat-value" id="eta">—</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Matches</h2>
+    <div id="results">
+      <p class="empty">No matches yet. Enter a prefix above and click Start search.</p>
+    </div>
+  </section>
+
+  <div class="footer">
+    BadCoin Vanity Address Generator v1.0 · runs entirely in your browser · no keys leave your device · for the BadCoin community
+  </div>
+
+</div>
+
+<script>
+{{SHA256_JS}}
+</script>
+<script>
+{{ELLIPTIC_JS}}
+</script>
+<script>
+{{QRCODE_JS}}
+</script>
+<script>
+{{JSPDF_JS}}
+</script>
+<script>
+{{APP_JS}}
+</script>
+</body>
+</html>
